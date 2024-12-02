@@ -23,7 +23,7 @@ export default function Home() {
         {/* Main Content */}
         <div className="py-16">
           <h1 className="text-4xl font-bold text-center mb-8">
-            Anorak's Temple
+            Anorak&apos;s Temple
           </h1>
           <p className="text-center text-xl mb-8">
             The Great Challenge Awaits
