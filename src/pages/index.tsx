@@ -4,9 +4,23 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import '@solana/wallet-adapter-react-ui/styles.css';
 
 export default function Home() {
+  // Initialize dark mode state
   const [isDark, setIsDark] = useState(true);
   const { connected } = useWallet();
   const [time, setTime] = useState(3600);
+
+  // Force dark mode on mount and when isDark changes
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark);
+    document.body.style.backgroundColor = isDark ? '#111827' : '#f3f4f6';
+  }, [isDark]);
+
+  // Initial dark mode setup
+  useEffect(() => {
+    setIsDark(true);
+    document.documentElement.classList.add('dark');
+    document.body.style.backgroundColor = '#111827';
+  }, []);
 
   useEffect(() => {
     const timer = time > 0 && setInterval(() => setTime(time - 1), 1000);
@@ -22,7 +36,7 @@ export default function Home() {
 
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
-      {/* Top bar with wallet and theme controls */}
+      {/* Top bar with wallet and theme controls - fixed position and right alignment */}
       <div className="fixed top-0 right-0 p-4 flex items-center gap-4">
         <button
           onClick={() => setIsDark(!isDark)}
@@ -40,7 +54,7 @@ export default function Home() {
         <WalletMultiButton />
       </div>
 
-      {/* Center content using table-like structure */}
+      {/* Center content using table */}
       <table style={{ width: '100%', height: '100vh' }}>
         <tbody>
           <tr>
@@ -54,7 +68,6 @@ export default function Home() {
                   The Great Challenge Awaits
                 </p>
 
-                {/* Timer section */}
                 <div>
                   <p className="text-3xl font-mono mb-4">{formatTime(time)}</p>
                   <button 
