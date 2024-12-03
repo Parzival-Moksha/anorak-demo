@@ -5,7 +5,11 @@ interface Message {
   content: string;
 }
 
-export default function ChatWindow() {
+interface ChatWindowProps {
+  onMessageSent: () => void;  // Add this prop
+}
+
+export default function ChatWindow({ onMessageSent }: ChatWindowProps) {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: 'I am Anorak, stay a while and listen...' }
   ]);
@@ -39,6 +43,10 @@ export default function ChatWindow() {
         role: 'assistant',
         content: data.reply
       }]);
+
+      // Call the callback to reset timer
+      onMessageSent();
+
     } catch (error) {
       console.error('Error:', error);
       setMessages(msgs => [...msgs, {
