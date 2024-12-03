@@ -62,8 +62,11 @@ export default async function handler(
     const lastMessage = messages.data
       .filter(msg => msg.role === 'assistant')[0];
 
-    const reply = lastMessage?.content[0]?.text?.value || 
-      "Hmm... the virtual winds are strange today.";
+    let reply = "Hmm... the virtual winds are strange today.";
+    
+    if (lastMessage?.content[0]?.type === 'text') {
+      reply = lastMessage.content[0].text.value;
+    }
 
     res.status(200).json({ reply });
 
