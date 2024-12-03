@@ -5,6 +5,12 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+const ASSISTANT_ID = process.env.ASSISTANT_ID;
+
+if (!ASSISTANT_ID) {
+  throw new Error('ASSISTANT_ID is not defined in environment variables');
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -29,7 +35,7 @@ export default async function handler(
     const run = await openai.beta.threads.runs.create(
       thread.id,
       {
-        assistant_id: process.env.ASSISTANT_ID
+        assistant_id: ASSISTANT_ID // Now TypeScript knows this is definitely a string
       }
     );
 
