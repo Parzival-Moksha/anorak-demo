@@ -29,7 +29,7 @@ export default async function handler(
     const run = await openai.beta.threads.runs.create(
       thread.id,
       {
-        assistant_id: process.env.ASSISTANT_ID // You'll need to add this to Vercel
+        assistant_id: process.env.ASSISTANT_ID
       }
     );
 
