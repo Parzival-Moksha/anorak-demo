@@ -10,25 +10,48 @@ export default function ChatWindow() {
     { role: 'assistant', content: 'I am Anorak, stay a while and listen...' }
   ]);
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isLoading) return;
 
-    // Add user message to chat
+    // Add user message
     const userMessage = { role: 'user' as const, content: input };
     setMessages(msgs => [...msgs, userMessage]);
     setInput('');
+    setIsLoading(true);
 
-    // TODO: Add API call here
-    // For now, just echo a response
-    const botMessage = { role: 'assistant' as const, content: `[Response placeholder]` };
-    setMessages(msgs => [...msgs, botMessage]);
+    try {
+      // Call our API route
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: input }),
+      });
+
+      const data = await response.json();
+      
+      // Add Anorak's response
+      setMessages(msgs => [...msgs, {
+        role: 'assistant',
+        content: data.reply
+      }]);
+    } catch (error) {
+      console.error('Error:', error);
+      setMessages(msgs => [...msgs, {
+        role: 'assistant',
+        content: 'My virtual circuits are a bit scrambled. Try again?'
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className={`w-96 mx-auto rounded-lg overflow-hidden shadow-lg`}>
-      {/* Chat messages */}
       <div className="h-96 overflow-y-auto p-4 bg-opacity-50 bg-gray-800">
         {messages.map((msg, index) => (
           <div
@@ -43,9 +66,13 @@ export default function ChatWindow() {
             {msg.content}
           </div>
         ))}
+        {isLoading && (
+          <div className="text-blue-400">
+            <span className="font-bold">Anorak is typing...</span>
+          </div>
+        )}
       </div>
 
-      {/* Input form */}
       <form onSubmit={handleSubmit} className="p-4 bg-gray-900 bg-opacity-50">
         <div className="flex gap-2">
           <input
@@ -57,7 +84,10 @@ export default function ChatWindow() {
           />
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isLoading}
+            className={`px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              isLoading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
             Send
           </button>
