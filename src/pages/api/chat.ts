@@ -1,11 +1,9 @@
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-const openai = new OpenAIApi(configuration);
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,21 +16,53 @@ export default async function handler(
   try {
     const { message } = req.body;
 
-    const completion = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
+    // Use your existing Assistant
+    const thread = await openai.beta.threads.create({
       messages: [
-        {
-          role: "system",
-          content: "You are Anorak, a wise and mysterious guide in the virtual world. You speak in a manner that combines wisdom with playful references to gaming and virtual reality. Keep responses concise but engaging."
-        },
         {
           role: "user",
           content: message
         }
-      ],
+      ]
     });
 
-    const reply = completion.data.choices[0]?.message?.content || "Hmm... the virtual winds are strange today.";
+    const run = await openai.beta.threads.runs.create(
+      thread.id,
+      {
+        assistant_id: process.env.ASSISTANT_ID // You'll need to add this to Vercel
+      }
+    );
+
+    // Wait for the run to complete
+    let runStatus = await openai.beta.threads.runs.retrieve(
+      thread.id,
+      run.id
+    );
+
+    while (runStatus.status !== 'completed') {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      runStatus = await openai.beta.threads.runs.retrieve(
+        thread.id,
+        run.id
+      );
+      
+      if (runStatus.status === 'failed') {
+        throw new Error('Assistant run failed');
+      }
+    }
+
+    // Get the messages
+    const messages = await openai.beta.threads.messages.list(
+      thread.id
+    );
+
+    // Get the last assistant message
+    const lastMessage = messages.data
+      .filter(msg => msg.role === 'assistant')[0];
+
+    const reply = lastMessage?.content[0]?.text?.value || 
+      "Hmm... the virtual winds are strange today.";
+
     res.status(200).json({ reply });
 
   } catch (error) {
