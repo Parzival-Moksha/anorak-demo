@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useWallet } from '@solana/wallet-adapter-react';
 import '@solana/wallet-adapter-react-ui/styles.css';
+import ChatWindow from '../components/ChatWindow';
 
 export default function Home() {
   // Initialize dark mode state
@@ -59,34 +60,39 @@ export default function Home() {
         <tbody>
           <tr>
             <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-              <div className="space-y-8">
-                <h1 className="text-4xl font-bold">
-                  Temple of Anorak
-                </h1>
-                
-                <p className="text-xl">
-                  The Great Challenge Awaits
-                </p>
+<div className="space-y-8">
+    <h1 className="text-4xl font-bold">
+      Temple of Anorak
+    </h1>
+    
+    <p className="text-xl">
+      The Great Challenge Awaits
+    </p>
 
-                <div>
-                  <p className="text-3xl font-mono mb-4">{formatTime(time)}</p>
-                  <button 
-                    onClick={() => setTime(3600)}
-                    className={`px-4 py-2 rounded-lg ${
-                      isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-300 hover:bg-gray-400'
-                    }`}
-                  >
-                    Reset Timer
-                  </button>
-                </div>
+    <div>
+      <p className="text-3xl font-mono mb-4">{formatTime(time)}</p>
+      <button 
+        onClick={() => setTime(3600)}
+        className={`px-4 py-2 rounded-lg ${
+          isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-300 hover:bg-gray-400'
+        }`}
+      >
+        Reset Timer
+      </button>
+    </div>
 
-                {!connected && (
-                  <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>
-                    Connect your wallet to begin the journey
-                  </p>
-                )}
-              </div>
-            </td>
+    {!connected && (
+      <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>
+        Connect your wallet to begin the journey
+      </p>
+    )}
+
+    {/* Add the chat window */}
+    <div className="mt-8">
+      <ChatWindow />
+    </div>
+  </div>
+</td>
           </tr>
         </tbody>
       </table>
